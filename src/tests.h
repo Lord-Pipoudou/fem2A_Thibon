@@ -53,7 +53,14 @@ namespace FEM2A {
         
         bool test_quadrature()
         {
-        	std::cout << "Test Quadrature" << std::endl;
+        	std::cout << "Test Quadrature :" << std::endl;
+        	double poids = 0;
+        	Quadrature Total;
+        	Total = Quadrature::get_quadrature(2);
+        	for(int i = 0; i < Total.Quadrature::nb_points(); i++){
+        		poids += Total.Quadrature::weight(i);
+        	}
+        	std::cout<<"Le poids total vaut "<< poids << std::endl;
         	return true;
         }
     }
