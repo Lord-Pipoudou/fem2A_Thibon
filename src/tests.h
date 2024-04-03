@@ -63,5 +63,32 @@ namespace FEM2A {
         	std::cout<<"Le poids total vaut "<< poids << std::endl;
         	return true;
         }
+        
+        bool test_element_edge()
+        {
+        	std::cout << "Test element edge :" << std::endl;
+        	Mesh mesh;
+            mesh.load("data/square.mesh");
+            ElementMapping element( mesh, true, 4);
+        	vertex point;
+        	point.x = 0.5;
+        	point.y = 0;
+        	vertex r = element.transform( point );
+        	std::cout << "transform : " << r.x << " " << r.y << std::endl;
+        	return true;
+        }
+        
+        bool test_element_triangle()
+        {
+        	std::cout << "Test element triangle :" << std::endl;
+        	Mesh mesh;
+            mesh.load("data/square.mesh");
+            ElementMapping element( mesh, false, 4);
+        	vertex point;
+        	point.x = 0.5;
+        	point.y = 0;
+        	//std::cout << "transform : " << element.transform( point ).x << " " << element.transform( point ).y << std::endl;
+        	return true;
+        }
     }
 }

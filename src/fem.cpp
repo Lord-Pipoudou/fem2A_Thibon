@@ -133,7 +133,24 @@ namespace FEM2A {
         : border_( border )
     {
         std::cout << "[ElementMapping] constructor for element " << i << " ";
-        if ( border ) std::cout << "(border)";
+        if ( border ) {
+        	std::cout << "(border)" << std::endl;
+        	vertex vertices_[2];
+        	vertices_[0] = M.get_edge_vertex(i, 0);
+        	vertices_[1] = M.get_edge_vertex(i, 1);
+        	std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y << "\n v1 : " << vertices_[1].x << " " << vertices_[0].y << std::endl;
+        }
+        else {
+        	std::cout << "(triangle)" << std::endl;
+        	vertex vertices_[3];
+        	vertices_[0] = M.get_triangle_vertex(i, 0);
+        	vertices_[1] = M.get_triangle_vertex(i, 1);
+        	vertices_[2] = M.get_triangle_vertex(i, 2);
+        	std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y 
+        	<< "\n v1 : " << vertices_[1].x << " " << vertices_[1].y 
+        	<< "\n v2 : " << vertices_[2].x << " " << vertices_[2].y << std::endl;
+        }
+        		
         std::cout << '\n';
         // TODO
     }
@@ -143,6 +160,10 @@ namespace FEM2A {
         std::cout << "[ElementMapping] transform reference to world space" << '\n';
         // TODO
         vertex r ;
+        if (border_){
+        	r.x = vertices_[0].x*(1-x_r.x) + vertices_[1].x*x_r.x;
+        	r.y = vertices_[0].y*(1-x_r.x) + vertices_[1].y*x_r.x;;
+        }
         return r ;
     }
 
