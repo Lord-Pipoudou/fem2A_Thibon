@@ -104,8 +104,58 @@ namespace FEM2A {
         	point.y = 0.4;
         	DenseMatrix J;
         	J = element.jacobian_matrix(point);
-        	std::cout << "J vaut :\n" << J.get(0, 0) << "\n" << J.get(0, 1) << std::endl; 
+        	std::cout << "J vaut :\n" << J.get(0, 0) << "\n" << J.get(0, 1) << std::endl;
+        	std::cout << "determinant : " << element.jacobian(point) << std::endl; 
         	return true;
+        }
+        
+        bool test_jacob_triangle()
+        {
+        	std::cout << "Test Jacob triangle :" << std::endl;
+        	Mesh mesh;
+           	mesh.load("data/square.mesh");
+            	ElementMapping element(mesh, false, 4);
+        	vertex point;
+        	point.x = 0.2;
+        	point.y = 0.4;
+        	DenseMatrix J;
+        	J = element.jacobian_matrix(point);
+        	std::cout << "J vaut :\n" << J.get(0, 0) << "\n" << J.get(0, 1) << "\n" << J.get(1, 0) << "\n" << J.get(1, 1) <<std::endl; 
+        	std::cout << "determinant : " << element.jacobian(point) << std::endl;
+        	return true;
+        }
+        
+        double unit_fct( vertex v )
+        {
+            return 1.;
+        }
+        
+        bool test_assemble()
+        {
+        	std::cout << "Test assemble :" << std::endl;
+        	Mesh mesh;
+           	mesh.load("data/square.mesh");
+            	ElementMapping element(mesh, false, 4);
+            	DenseMatrix Ke;
+            	Ke.set_size(3, 3);
+            	for (int i = 0; i < 3; ++i){
+            		for (int j = 0; j < 3; ++j){
+            			Ke.set(i, j, 0);
+            		}
+            	}
+            	ShapeFunctions shape(2, 1);
+            	Quadrature Q;
+            	Q = Quadrature::get_quadrature(2);
+            	
+            	assemble_elementary_matrix(element, shape, Q, unit_fct, Ke );
+            	for (int i = 0; i < 3; ++i){
+            		for (int j = 0; j < 3; ++j){
+            			std::cout << Ke.get(i, j) << " ";
+            		}
+            		std::cout << std::endl;
+            	}
+            	
+            	return true;
         }
         	
     }
