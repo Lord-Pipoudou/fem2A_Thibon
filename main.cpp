@@ -32,8 +32,9 @@ void run_tests()
     const bool t_lmesh = false;
     const bool t_io = false;
     const bool t_quad = false;
-    const bool t_edge = true;
-    const bool t_triangle = true;
+    const bool t_edge = false;
+    const bool t_triangle = false;
+    const bool t_jac_edge = true;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
@@ -41,6 +42,7 @@ void run_tests()
     if( t_quad ) Tests::test_quadrature();
     if( t_edge ) Tests::test_element_edge();
     if( t_triangle ) Tests::test_element_triangle();
+    if( t_jac_edge ) Tests::test_jacob_edge();
 }
 
 void run_simu()

@@ -7,6 +7,7 @@
 #include <limits>
 #include <stdlib.h>
 #include <assert.h>
+#include <vector>
 
 namespace FEM2A {
 
@@ -132,23 +133,27 @@ namespace FEM2A {
     ElementMapping::ElementMapping( const Mesh& M, bool border, int i )
         : border_( border )
     {
-        std::cout << "[ElementMapping] constructor for element " << i << " ";
+        //std::cout << "[ElementMapping] constructor for element " << i << " ";
+        std::vector< vertex > vertices;
         if ( border ) {
-        	std::cout << "(border)" << std::endl;
-        	vertex vertices_[2];
-        	vertices_[0] = M.get_edge_vertex(i, 0);
-        	vertices_[1] = M.get_edge_vertex(i, 1);
-        	std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y << "\n v1 : " << vertices_[1].x << " " << vertices_[0].y << std::endl;
+        	//std::cout << "(border)" << std::endl;
+        	for( int v=0; v<2; v++){
+        		vertices.push_back( M.get_edge_vertex(i, v));
+        	}
+        	vertices_ = vertices; 
+        	/*std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y << "\nv1 : " << vertices_[1].x << " " << vertices_[1].y << std::endl;*/
+        	
         }
         else {
-        	std::cout << "(triangle)" << std::endl;
-        	vertex vertices_[3];
-        	vertices_[0] = M.get_triangle_vertex(i, 0);
-        	vertices_[1] = M.get_triangle_vertex(i, 1);
-        	vertices_[2] = M.get_triangle_vertex(i, 2);
-        	std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y 
+        	//std::cout << "(triangle)" << std::endl;
+        	for( int v=0; v < 3; v++){
+        		//std::cout << v << std::endl;
+        		vertices.push_back( M.get_triangle_vertex(i, v));
+        	}
+        	vertices_ = vertices;
+        	/*std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y 
         	<< "\n v1 : " << vertices_[1].x << " " << vertices_[1].y 
-        	<< "\n v2 : " << vertices_[2].x << " " << vertices_[2].y << std::endl;
+        	<< "\n v2 : " << vertices_[2].x << " " << vertices_[2].y << std::endl;*/
         }
         		
         std::cout << '\n';
@@ -160,10 +165,19 @@ namespace FEM2A {
         std::cout << "[ElementMapping] transform reference to world space" << '\n';
         // TODO
         vertex r ;
+        double xi = x_r.x;
+        double eta = x_r.y;
         if (border_){
-        	r.x = vertices_[0].x*(1-x_r.x) + vertices_[1].x*x_r.x;
-        	r.y = vertices_[0].y*(1-x_r.x) + vertices_[1].y*x_r.x;;
+        	r.x = (vertices_[0].x)*(1-xi) + (vertices_[1].x)*xi;
+        	r.y = (vertices_[0].y)*(1-xi) + (vertices_[1].y)*xi;
+        	
         }
+        
+        else {
+        	r.x = (vertices_[0].x)*(1.0-xi-eta) + (vertices_[1].x)*xi + (vertices_[2].x)*eta;
+        	r.y = (vertices_[0].y)*(1.0-xi-eta) + (vertices_[1].y)*xi + (vertices_[2].y)*eta;
+        }
+        
         return r ;
     }
 
@@ -172,6 +186,11 @@ namespace FEM2A {
         std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
         // TODO
         DenseMatrix J ;
+        if (border_){
+        	J.set_size(1,2);
+        	J.set(0, 0, vertices_[1].x-vertices_[0].x);
+        	J.set(0, 1, vertices_[1].y-vertices_[0].y);
+        }
         return J ;
     }
 

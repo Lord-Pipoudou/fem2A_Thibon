@@ -68,12 +68,13 @@ namespace FEM2A {
         {
         	std::cout << "Test element edge :" << std::endl;
         	Mesh mesh;
-            mesh.load("data/square.mesh");
+           	mesh.load("data/square.mesh");
             ElementMapping element( mesh, true, 4);
         	vertex point;
-        	point.x = 0.5;
+        	point.x = 0.2;
         	point.y = 0;
-        	vertex r = element.transform( point );
+        	vertex r;
+        	r = element.transform( point );
         	std::cout << "transform : " << r.x << " " << r.y << std::endl;
         	return true;
         }
@@ -82,13 +83,30 @@ namespace FEM2A {
         {
         	std::cout << "Test element triangle :" << std::endl;
         	Mesh mesh;
-            mesh.load("data/square.mesh");
-            ElementMapping element( mesh, false, 4);
+           	mesh.load("data/square.mesh");
+            ElementMapping element(mesh, false, 4);
         	vertex point;
-        	point.x = 0.5;
-        	point.y = 0;
-        	//std::cout << "transform : " << element.transform( point ).x << " " << element.transform( point ).y << std::endl;
+        	point.x = 0.2;
+        	point.y = 0.4;
+        	vertex r = element.transform( point );
+        	std::cout << "transform : " << r.x << " " << r.y << std::endl;
         	return true;
         }
+        
+        bool test_jacob_edge()
+        {
+        	std::cout << "Test Jacob edge :" << std::endl;
+        	Mesh mesh;
+           	mesh.load("data/square.mesh");
+            ElementMapping element(mesh, true, 4);
+        	vertex point;
+        	point.x = 0.2;
+        	point.y = 0.4;
+        	DenseMatrix J;
+        	J = element.jacobian_matrix(point);
+        	std::cout << "J vaut :\n" << J.get(0, 0) << "\n" << J.get(0, 1) << std::endl; 
+        	return true;
+        }
+        	
     }
 }
