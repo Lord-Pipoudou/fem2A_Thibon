@@ -319,14 +319,19 @@ namespace FEM2A {
         
     }
 
+    
+
     void local_to_global_matrix(
         const Mesh& M,
         int t,
         const DenseMatrix& Ke,
         SparseMatrix& K )
-    {
-        std::cout << "Ke -> K" << '\n';
-        // TODO
+    {    
+        for (int i = 0; i < Ke.height(); i++){
+        	for (int j = 0; j < Ke.width(); j++){
+          		K.add(M.get_triangle_vertex_index(t,i), M.get_triangle_vertex_index(t,j), Ke.get(i,j));
+        	}
+        }
     }
 
     void assemble_elementary_vector(
@@ -338,6 +343,23 @@ namespace FEM2A {
     {
         std::cout << "compute elementary vector (source term)" << '\n';
         // TODO
+        
+        int nbr_quad = quadrature.nb_points(); 
+        int max = reference_functions.nb_functions();
+        
+        for (int i = 0; i < max; ++i){
+        	double Fe_i = 0;
+        	for (int q = 0; q < nbr_quad; ++q){
+        		vertex quad = quadrature.point(q);
+        		double w = quadrature.weight(q); 
+        		double shape_i = reference_functions.evaluate(i, quad);
+        		double det = elt_mapping.jacobian(quad);
+        		vertex Me = elt_mapping.transform(quad);
+        		
+        		Fe_i += w*shape_i*source(Me)*det;
+        	}
+    		Fe.push_back(Fe_i);
+        }
     }
 
     void assemble_elementary_neumann_vector(
@@ -349,6 +371,8 @@ namespace FEM2A {
     {
         std::cout << "compute elementary vector (neumann condition)" << '\n';
         // TODO
+        
+        
     }
 
     void local_to_global_vector(
@@ -360,6 +384,19 @@ namespace FEM2A {
     {
         std::cout << "Fe -> F" << '\n';
         // TODO
+        
+        
+        
+        for (int j = 0; j < Fe.size(); ++j){
+    		int indice;
+        	if (border){
+        		indice = M.get_edge_vertex_index( i, j );
+        	}
+        	else {
+        		indice = M.get_triangle_vertex_index(i,j);
+        	}
+        	F[indice] += Fe[i];
+        }
     }
 
     void apply_dirichlet_boundary_conditions(
@@ -371,6 +408,8 @@ namespace FEM2A {
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
         // TODO
+        
+        
     }
 
     void solve_poisson_problem(

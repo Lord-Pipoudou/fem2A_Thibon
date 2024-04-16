@@ -3,6 +3,7 @@
 #include "mesh.h"
 #include "fem.h"
 #include "solver.h"
+#include "simu.h"
 
 #include <assert.h>
 #include <iostream>
@@ -124,13 +125,14 @@ namespace FEM2A {
         	std::cout << "determinant : " << element.jacobian(point) << std::endl;
         	return true;
         }
-        
+        /*
         double unit_fct( vertex v )
         {
             return 1.;
         }
+        */
         
-        bool test_assemble()
+        bool test_assemble_elementary_matrix()
         {
         	std::cout << "Test assemble :" << std::endl;
         	Mesh mesh;
@@ -147,7 +149,7 @@ namespace FEM2A {
             	Quadrature Q;
             	Q = Quadrature::get_quadrature(2);
             	
-            	assemble_elementary_matrix(element, shape, Q, unit_fct, Ke );
+            	assemble_elementary_matrix(element, shape, Q, Simu::unit_fct, Ke );
             	for (int i = 0; i < 3; ++i){
             		for (int j = 0; j < 3; ++j){
             			std::cout << Ke.get(i, j) << " ";
@@ -157,6 +159,78 @@ namespace FEM2A {
             	
             	return true;
         }
-        	
+        
+        bool test_assemble_elementary_vector()
+        {
+        	std::cout << "Test assemble :" << std::endl;
+        	Mesh mesh;
+           	mesh.load("data/square.mesh");
+            	ElementMapping element(mesh, false, 4);
+            	ElementMapping element_edge(mesh, true, 4);
+            	std::vector <double > Fe;
+            	std::vector <double > Fe_edge;
+            	ShapeFunctions shape(2, 1);
+            	Quadrature Q;
+            	Q = Quadrature::get_quadrature(2);
+            	
+            	std::cout << "Pour le triangle :" << std::endl;
+            	assemble_elementary_vector(element, shape, Q, Simu::unit_fct, Fe );
+            	for (int i = 0; i < Fe.size(); ++i){
+    			std::cout << Fe[i] << std::endl;
+            	}
+            	std::cout << "Pour le bord :" << std::endl;
+            	assemble_elementary_vector(element_edge, shape, Q, Simu::unit_fct, Fe_edge );
+            	for (int i = 0; i < Fe_edge.size(); ++i){
+    			std::cout << Fe_edge[i] << std::endl;
+            	}
+            	
+            	return true;
+        }
+        
+        bool test_assemble_Ke_K()
+        {
+		std::cout << "\ntest assemblage Ke :\n";
+		Quadrature quadrature;
+		quadrature = quadrature.get_quadrature(2, false);
+		Mesh mesh;
+		mesh.load("data/square.mesh");
+		ElementMapping element(mesh, false, 4);
+		ShapeFunctions reference_functions = ShapeFunctions(2,1);
+		DenseMatrix Ke;
+		Ke.set_size(3,3);
+		
+		std::cout << "\ntest assemblage global K :\n";
+		assemble_elementary_matrix( element, reference_functions, quadrature, Simu::unit_fct, Ke);
+		Ke.print();
+		SparseMatrix K = SparseMatrix( mesh.nb_vertices());
+		local_to_global_matrix(mesh, 4, Ke, K );
+		K.print();
+		return true;
+        }
+        
+        bool test_F()
+        {
+        	std::cout << "Test assemble Fe:" << std::endl;
+        	Mesh mesh;
+           	mesh.load("data/square.mesh");
+            	ElementMapping element(mesh, false, 4);
+            	std::vector <double > Fe;
+            	
+            	Quadrature quadrature;
+		quadrature = quadrature.get_quadrature(0, false);
+		ShapeFunctions reference_functions = ShapeFunctions(2,1);
+		
+		
+		std::cout << "\ntest assemblage global F :\n";
+		assemble_elementary_vector( element, reference_functions, quadrature, Simu::unit_fct, Fe);
+		/*
+		Fe.print();
+		std:vector < double > F (100);  // <---- A remplir
+		local_to_global_vector(mesh, 4, Fe, F );
+		F.print();
+		*/
+            	
+            	return true;
+        }	
     }
 }

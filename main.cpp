@@ -36,7 +36,9 @@ void run_tests()
     const bool t_triangle = false;
     const bool t_jac_edge = false;
     const bool t_jac_triangle = false;
-    const bool t_assemble = true;
+    const bool t_assemble_matrix = false;
+    const bool t_assemble_vector = true;
+    const bool t_Ke = false;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
@@ -46,7 +48,9 @@ void run_tests()
     if( t_triangle ) Tests::test_element_triangle();
     if( t_jac_edge ) Tests::test_jacob_edge();
     if( t_jac_triangle ) Tests::test_jacob_triangle();
-    if( t_assemble) Tests::test_assemble();
+    if( t_assemble_matrix) Tests::test_assemble_elementary_matrix();
+    if( t_assemble_vector) Tests::test_assemble_elementary_vector();
+    if( t_Ke) Tests::test_assemble_Ke_K();
 }
 
 void run_simu()
