@@ -156,7 +156,7 @@ namespace FEM2A {
         	<< "\n v2 : " << vertices_[2].x << " " << vertices_[2].y << std::endl;*/
         }
         		
-        std::cout << '\n';
+        //std::cout << '\n';
         // TODO
     }
 
@@ -292,7 +292,7 @@ namespace FEM2A {
         double (*coefficient)(vertex),
         DenseMatrix& Ke )
     {
-        std::cout << "compute elementary matrix" << '\n';
+        //std::cout << "compute elementary matrix" << '\n';
         // TODO
         int max = reference_functions.nb_functions();
         int nbr_quad = quadrature.nb_points(); 
@@ -341,7 +341,7 @@ namespace FEM2A {
         double (*source)(vertex),
         std::vector< double >& Fe )
     {
-        std::cout << "compute elementary vector (source term)" << '\n';
+        //std::cout << "compute elementary vector (source term)" << '\n';
         // TODO
         
         int nbr_quad = quadrature.nb_points(); 
@@ -369,7 +369,7 @@ namespace FEM2A {
         double (*neumann)(vertex),
         std::vector< double >& Fe )
     {
-        std::cout << "compute elementary vector (neumann condition)" << '\n';
+        //std::cout << "compute elementary vector (neumann condition)" << '\n';
         // TODO
         
         
@@ -382,21 +382,23 @@ namespace FEM2A {
         std::vector< double >& Fe,
         std::vector< double >& F )
     {
-        std::cout << "Fe -> F" << '\n';
+        //std::cout << "Fe -> F" << '\n';
         // TODO
         
-        
-        
-        for (int j = 0; j < Fe.size(); ++j){
-    		int indice;
-        	if (border){
+        int indice;
+        if (border){
+        	for (int j = 0; j < Fe.size(); ++j){
         		indice = M.get_edge_vertex_index( i, j );
+        		F[indice] += Fe[j];
         	}
-        	else {
-        		indice = M.get_triangle_vertex_index(i,j);
-        	}
-        	F[indice] += Fe[j];
         }
+        else {
+        	for (int j = 0; j < Fe.size(); ++j){
+        		indice = M.get_triangle_vertex_index(i,j);
+        		F[indice] += Fe[j];
+        	}
+        }
+        
     }
 
     void apply_dirichlet_boundary_conditions(
@@ -407,19 +409,25 @@ namespace FEM2A {
         std::vector< double >& F )
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
-        // TODO
+        // TODO  --> Il faut faire attention à ne pas repacer par le même vertex
         
         double P = 10000;
+        std::vector <bool> node_done;
+        for (int a = 0; a < M.nb_vertices(); a++){
+                 node_done.push_back(true);
+        }
         for (int i = 0; i < attribute_is_dirichlet.size(); ++i){
         	if (attribute_is_dirichlet[i]){
         		for (int j = 0; j < 2; ++j){
         			int index = M.get_edge_vertex_index(i, j); 
-	        		K.add(index, index, P);
-    	    		F[index] += values[index]*P;
+        			if( node_done[index] ){
+	        			K.add(index, index, P);
+    	    			F[index] += values[index]*P;
+    	    			node_done[index] = false;
+    	    		}
     	    	}
         	}
         }
-        
     }
 
     void solve_poisson_problem(

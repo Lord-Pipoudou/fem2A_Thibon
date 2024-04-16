@@ -228,7 +228,7 @@ namespace FEM2A {
     			std::cout << Fe[i] << std::endl;
             	}
             	std::cout << "\n F : \n"  << std::endl;
-		std::vector < double > F (mesh.nb_vertices());  // <---- A remplir
+		std::vector < double > F (mesh.nb_vertices());  
 		local_to_global_vector(mesh, false, 4, Fe, F );
 		
 		for (int i = 0; i < F.size(); ++i){
