@@ -223,12 +223,17 @@ namespace FEM2A {
 		
 		std::cout << "\ntest assemblage global F :\n";
 		assemble_elementary_vector( element, reference_functions, quadrature, Simu::unit_fct, Fe);
-		/*
-		Fe.print();
-		std:vector < double > F (100);  // <---- A remplir
-		local_to_global_vector(mesh, 4, Fe, F );
-		F.print();
-		*/
+		std::cout << "Fe:" << std::endl;
+		for (int i = 0; i < Fe.size(); ++i){
+    			std::cout << Fe[i] << std::endl;
+            	}
+            	std::cout << "\n F : \n"  << std::endl;
+		std::vector < double > F (mesh.nb_vertices());  // <---- A remplir
+		local_to_global_vector(mesh, false, 4, Fe, F );
+		
+		for (int i = 0; i < F.size(); ++i){
+    			std::cout << F[i] << std::endl;
+            	}
             	
             	return true;
         }	

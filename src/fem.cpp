@@ -395,7 +395,7 @@ namespace FEM2A {
         	else {
         		indice = M.get_triangle_vertex_index(i,j);
         	}
-        	F[indice] += Fe[i];
+        	F[indice] += Fe[j];
         }
     }
 
@@ -409,6 +409,16 @@ namespace FEM2A {
         std::cout << "apply dirichlet boundary conditions" << '\n';
         // TODO
         
+        double P = 10000;
+        for (int i = 0; i < attribute_is_dirichlet.size(); ++i){
+        	if (attribute_is_dirichlet[i]){
+        		for (int j = 0; j < 2; ++j){
+        			int index = M.get_edge_vertex_index(i, j); 
+	        		K.add(index, index, P);
+    	    		F[index] += values[index]*P;
+    	    	}
+        	}
+        }
         
     }
 
