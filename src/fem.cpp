@@ -372,6 +372,23 @@ namespace FEM2A {
         //std::cout << "compute elementary vector (neumann condition)" << '\n';
         // TODO
         
+        int nbr_quad = quadrature_1D.nb_points(); 
+        int max = reference_functions_1D.nb_functions();
+        
+        for (int i = 0; i < max; ++i){
+        	double Fe_i = 0;
+        	for (int q = 0; q < nbr_quad; ++q){
+        		vertex quad = quadrature_1D.point(q);
+        		double w = quadrature_1D.weight(q); 
+        		double shape_i = reference_functions_1D.evaluate(i, quad);
+        		double det = elt_mapping_1D.jacobian(quad);
+        		vertex Me = elt_mapping_1D.transform(quad);
+        		
+        		Fe_i += w*shape_i*neumann(Me)*det;
+        	}
+    		Fe.push_back(Fe_i);
+        }
+        
         
     }
 
@@ -409,8 +426,8 @@ namespace FEM2A {
         std::vector< double >& F )
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
-        // TODO  --> Il faut faire attention à ne pas repacer par le même vertex
-        
+        // TODO 
+        /*
         double P = 10000;
         std::vector <bool> node_done;
         for (int a = 0; a < M.nb_vertices(); a++){
@@ -428,6 +445,27 @@ namespace FEM2A {
     	    	}
         	}
         }
+        */
+        
+        //SOLUTION DU PROF : Donne la même chose :(
+        std::vector < bool > processed_verticies(values.size(), false);
+        double P = 10000;
+        for( int edge = 0; edge < M.nb_edges(); edge++){
+        	int edge_attribute = M.get_edge_attribute(edge);
+        	if ( attribute_is_dirichlet[edge_attribute] ) {
+        		for( int v = 0; v < 2; v++ ){
+        			int vertex_index = M.get_edge_vertex_index(edge, v);
+        			if( !processed_verticies[vertex_index] ){
+        				processed_verticies[vertex_index] = true;
+        				K.add(vertex_index, vertex_index, P);
+        				F[vertex_index] += P*values[vertex_index];
+        			}
+        		}
+        	}
+        }
+        
+        
+        
     }
 
     void solve_poisson_problem(

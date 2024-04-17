@@ -38,7 +38,7 @@ void run_tests()
     const bool t_jac_triangle = false;
     const bool t_assemble_matrix = false;
     const bool t_assemble_vector = false;
-    const bool t_Ke = false;
+    const bool t_Ke = true;
     const bool t_F = true;
 
     if( t_opennl ) test_opennl();
@@ -58,13 +58,25 @@ void run_tests()
 void run_simu()
 {
 
-    const bool simu_pure_dirichlet = true;
+    const bool simu_pure_dirichlet = false;
+    const bool simu_source_dirichlet = false;
+    const bool simu_sinus_bump_dirichlet = false;
+    const bool simu_neumann = true;
 
     const bool verbose = flag_is_used( "-v", arguments )
         || flag_is_used( "--verbose", arguments );
 
     if( simu_pure_dirichlet ) {
         Simu::pure_dirichlet_pb("data/square.mesh", verbose);
+    }
+    if( simu_source_dirichlet ) {
+        Simu::source_dirichlet_pb("data/square.mesh", verbose);
+    }
+    if( simu_sinus_bump_dirichlet ) {
+        Simu::sinus_bump_dirichlet_pb("data/square.mesh", verbose);
+    }
+    if( simu_neumann) {
+        Simu::neumann_pb("data/square.mesh", verbose);
     }
 }
 
