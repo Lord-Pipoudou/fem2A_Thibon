@@ -44,7 +44,17 @@ namespace FEM2A {
         
         double droite( vertex v )
         {
-        	if (v.x == 1){
+        	if (abs(v.x - 1) < 0.001){
+        		return 1;
+        	}
+        	else {
+	        	return 0;
+	        }
+        }
+        
+        double gauche( vertex v )
+        {
+        	if (abs(v.x) < 0.001){
         		return 1;
         	}
         	else {
@@ -90,7 +100,7 @@ namespace FEM2A {
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
         	std::vector <double> U;
         	solve(K, F, U);
-        	save_solution(U, "square.bb");
+        	save_solution(U, "square_fine.bb");
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
@@ -134,7 +144,7 @@ namespace FEM2A {
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
         	std::vector <double> U;
         	solve(K, F, U);
-        	save_solution(U, "square.bb");
+        	save_solution(U, "square_fine.bb");
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
@@ -193,7 +203,14 @@ namespace FEM2A {
             
             Mesh M;
             M.load(mesh_filename);
+            M.set_attribute( unit_fct,  2, true);
+            }
+			apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
+			for (int i = 0; i < M.nb_edges(); ++i){
+				std::cout<<M.get_edge_attribute(i)<<std::endl;
             M.set_attribute( droite,  0, true);
+            M.set_attribute( gauche,  1, true);
+
             std::vector <double> F(M.nb_vertices(), 0);
             SparseMatrix K(M.nb_vertices());
 			Quadrature quad;
@@ -222,19 +239,20 @@ namespace FEM2A {
             attr_dirich.push_back(false);
             for (int i = 0; i < M.nb_vertices(); ++i){
             	values[i] = zero_fct(M.get_vertex(i));
-            }
-        	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
-        	for (int i = 0; i < M.nb_edges(); ++i){ //ATTENTION : fait aussi sur le bord droit, comment empêcher ?
-        		ElementMapping element( M, true, i);
-        		std::vector < double > Fe;
-        		assemble_elementary_neumann_vector(element, shape_1D, quad_1D, neum, Fe);
-        	std::vector <double> U;
-        	solve(K, F, U);
-        	save_solution(U, "square.bb");
-        	if ( verbose ) {
-        		for (int i = 0; i < U.size(); ++i){ 
-                	std::cout << U[i] << std::endl;
-                }
+				if( M.get_edge_attribute(i) == 1 ){
+					ElementMapping element( M, true, i);
+					std::vector < double > Fe;
+					assemble_elementary_neumann_vector(element, shape_1D, quad_1D, neum, Fe);
+					local_to_global_vector( M, true, i, Fe, F);
+				}
+			}
+			std::vector <double> U;
+			solve(K, F, U);
+			save_solution(U, "square.bb");
+			if ( verbose ) {
+				for (int i = 0; i < U.size(); ++i){ 
+					std::cout << U[i] << std::endl;
+				}
             }
             
         }

@@ -7,7 +7,7 @@
 #include "src/solver.h"
 #include "src/tests.h"
 #include "src/simu.h"
-
+/*
 /* Global variables */
 std::vector< std::string > arguments;
 
@@ -55,6 +55,7 @@ void run_tests()
     if( t_F ) Tests::test_F();
 }
 
+
 void run_simu()
 {
 
@@ -67,10 +68,10 @@ void run_simu()
         || flag_is_used( "--verbose", arguments );
 
     if( simu_pure_dirichlet ) {
-        Simu::pure_dirichlet_pb("data/square.mesh", verbose);
+        Simu::pure_dirichlet_pb("data/square_fine.mesh", verbose);
     }
     if( simu_source_dirichlet ) {
-        Simu::source_dirichlet_pb("data/square.mesh", verbose);
+        Simu::source_dirichlet_pb("data/square_fine.mesh", verbose);
     }
     if( simu_sinus_bump_dirichlet ) {
         Simu::sinus_bump_dirichlet_pb("data/square.mesh", verbose);
@@ -113,3 +114,4 @@ int main( int argc, const char * argv[] )
 
     return 0;
 }
+
