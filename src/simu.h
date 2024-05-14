@@ -197,14 +197,13 @@ namespace FEM2A {
             
         }
         
-        /*void neumann_pb( const std::string& mesh_filename, bool verbose )
+        void neumann_pb( const std::string& mesh_filename, bool verbose )
         {
             std::cout << "Solving a neumann problem \n" << std::endl;
             
             Mesh M;
             M.load(mesh_filename);
             M.set_attribute( unit_fct,  2, true);
-			apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
 			for (int i = 0; i < M.nb_edges(); ++i){
 				std::cout<<M.get_edge_attribute(i)<<std::endl;
 			}
@@ -237,8 +236,11 @@ namespace FEM2A {
             std::vector < double > values(M.nb_vertices());
             attr_dirich.push_back(true);
             attr_dirich.push_back(false);
+            attr_dirich.push_back(false);
             for (int i = 0; i < M.nb_vertices(); ++i){
             	values[i] = zero_fct(M.get_vertex(i));
+            }
+            for (int i = 0; i < M.nb_edges(); ++i){
 				if( M.get_edge_attribute(i) == 1 ){
 					ElementMapping element( M, true, i);
 					std::vector < double > Fe;
@@ -246,9 +248,11 @@ namespace FEM2A {
 					local_to_global_vector( M, true, i, Fe, F);
 				}
 			}
+			
+			apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
 			std::vector <double> U;
 			solve(K, F, U);
-			save_solution(U, "square.bb");
+			save_solution(U, "neumann_square_fine.bb");
 			if ( verbose ) {
 				for (int i = 0; i < U.size(); ++i){ 
 					std::cout << U[i] << std::endl;
@@ -256,7 +260,7 @@ namespace FEM2A {
             }
             
         }
-        */
+        
 
     }
 
