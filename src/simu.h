@@ -100,7 +100,7 @@ namespace FEM2A {
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
         	std::vector <double> U;
         	solve(K, F, U);
-        	save_solution(U, "square_fine.bb");
+        	save_solution(U, "pure_dirichlet_square_fine.bb");
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
@@ -144,7 +144,7 @@ namespace FEM2A {
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
         	std::vector <double> U;
         	solve(K, F, U);
-        	save_solution(U, "square_fine.bb");
+        	save_solution(U, "source_dirichlet_square_fine.bb");
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
@@ -188,7 +188,7 @@ namespace FEM2A {
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
         	std::vector <double> U;
         	solve(K, F, U);
-        	save_solution(U, "square.bb");
+        	save_solution(U, "sinus_bump_square.bb");
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
@@ -197,17 +197,17 @@ namespace FEM2A {
             
         }
         
-        void neumann_pb( const std::string& mesh_filename, bool verbose )
+        /*void neumann_pb( const std::string& mesh_filename, bool verbose )
         {
             std::cout << "Solving a neumann problem \n" << std::endl;
             
             Mesh M;
             M.load(mesh_filename);
             M.set_attribute( unit_fct,  2, true);
-            }
 			apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
 			for (int i = 0; i < M.nb_edges(); ++i){
 				std::cout<<M.get_edge_attribute(i)<<std::endl;
+			}
             M.set_attribute( droite,  0, true);
             M.set_attribute( gauche,  1, true);
 
@@ -256,6 +256,7 @@ namespace FEM2A {
             }
             
         }
+        */
 
     }
 
