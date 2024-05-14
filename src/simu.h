@@ -204,9 +204,6 @@ namespace FEM2A {
             Mesh M;
             M.load(mesh_filename);
             M.set_attribute( unit_fct,  2, true);
-			for (int i = 0; i < M.nb_edges(); ++i){
-				std::cout<<M.get_edge_attribute(i)<<std::endl;
-			}
             M.set_attribute( droite,  0, true);
             M.set_attribute( gauche,  1, true);
 

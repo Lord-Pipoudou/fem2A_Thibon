@@ -425,29 +425,8 @@ namespace FEM2A {
         SparseMatrix& K,
         std::vector< double >& F )
     {
-        std::cout << "apply dirichlet boundary conditions" << '\n';
-        // TODO 
-        /*
-        double P = 10000;
-        std::vector <bool> node_done;
-        for (int a = 0; a < M.nb_vertices(); a++){
-                 node_done.push_back(true);
-        }
-        for (int i = 0; i < attribute_is_dirichlet.size(); ++i){
-        	if (attribute_is_dirichlet[i]){
-        		for (int j = 0; j < 2; ++j){
-        			int index = M.get_edge_vertex_index(i, j); 
-        			if( node_done[index] ){
-	        			K.add(index, index, P);
-    	    			F[index] += values[index]*P;
-    	    			node_done[index] = false;
-    	    		}
-    	    	}
-        	}
-        }
-        */
+        // std::cout << "apply dirichlet boundary conditions" << '\n';
         
-        //SOLUTION DU PROF : Donne la même chose :(
         std::vector < bool > processed_verticies(values.size(), false);
         double P = 10000;
         for( int edge = 0; edge < M.nb_edges(); edge++){
