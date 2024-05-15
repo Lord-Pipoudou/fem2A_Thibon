@@ -61,9 +61,9 @@ void run_simu()
 
     const bool simu_pure_dirichlet = false;
     const bool simu_source_dirichlet = false;
-    const bool simu_sinus_bump_dirichlet = true;
+    const bool simu_sinus_bump_dirichlet = false;
     const bool simu_neumann = false;
-    const bool simu_mug = false;
+    const bool simu_mug = true;
 
     const bool verbose = flag_is_used( "-v", arguments )
         || flag_is_used( "--verbose", arguments );
@@ -83,7 +83,7 @@ void run_simu()
     }
     
     if( simu_mug ) {
-        Simu::mug_pb("data/mug_0_5.mesh", verbose);
+        Simu::mug_pb("data/mug_1.mesh", verbose);
     }
     
 }

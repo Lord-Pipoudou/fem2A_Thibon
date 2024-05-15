@@ -70,19 +70,28 @@ namespace FEM2A {
         double mug_eau_bouill( vertex v )
         {
         	double eps = 0.001; 
+        	
+        	// Pour le cas ou le vertex se situe sur le fond du mug
         	if (abs(v.y - 1) < eps){
-        		if (abs(v.x - 1) < eps || abs(v.x - 20) < eps){
+        	
+        		if (v.x > 1 - eps && v.x < 20 + eps){
         			return 1;
         		}
+        		
         		else{ return 0; }
         	}
+        	
+        	// Pour le cas où le vertex se situe sur la paroi verticale intérieure en contact avec l'eau bouillante
         	else {
         		if (abs(v.x - 1) < eps || abs(v.x - 20) < eps){
-        			if (v.y > 1 && v.y < 10){
+        		
+        			if (v.y > 1 - eps && v.y < 10 + eps){
         				return 1;
         			}
+        			
         			else{ return 0; }
         		}
+        		
         		else{ return 0; }
         	}
         }
@@ -102,8 +111,10 @@ namespace FEM2A {
             Mesh M;
             M.load(mesh_filename);
             M.set_attribute( unit_fct,  0, true);
+            
             std::vector <double> F(M.nb_vertices(), 0);
             SparseMatrix K(M.nb_vertices());
+            
 			Quadrature quad;
 			quad = quad.get_quadrature(2, false);
 			ShapeFunctions shape = ShapeFunctions(2,1);
@@ -114,6 +125,7 @@ namespace FEM2A {
             	DenseMatrix Ke;
             	Ke.set_size(3,3);
             	std::vector < double > Fe;
+            	
             	assemble_elementary_matrix( element, shape, quad, unit_fct, Ke);
             	local_to_global_matrix( M, i, Ke, K);
             }
@@ -370,7 +382,7 @@ namespace FEM2A {
 			
 			std::vector <double> U;
 			solve(K, F, U);
-			save_solution(U, "mug_0_5.bb");
+			save_solution(U, "mug_1.bb");
 			
 			if ( verbose ) {
 				for (int i = 0; i < U.size(); ++i){ 
