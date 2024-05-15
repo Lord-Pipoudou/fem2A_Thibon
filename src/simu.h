@@ -34,7 +34,12 @@ namespace FEM2A {
         
         double sin_bump( vertex v )
         {
-        	return 2*pow(2, M_PI)*sin(M_PI*v.x)*sin(M_PI*v.y);
+        	return 2*pow(M_PI, 2)*sin(M_PI*v.x)*sin(M_PI*v.y);
+        }
+        
+        double soluce_sin_bump( vertex v )
+        {
+        	return sin(M_PI*v.x)*sin(M_PI*v.y);
         }
         
         double neum( vertex v )
@@ -138,8 +143,10 @@ namespace FEM2A {
             Mesh M;
             M.load(mesh_filename);
             M.set_attribute( unit_fct,  0, true);
+            
             std::vector <double> F(M.nb_vertices(), 0);
             SparseMatrix K(M.nb_vertices());
+            
 			Quadrature quad;
 			quad = quad.get_quadrature(2, false);
 			ShapeFunctions shape = ShapeFunctions(2,1);
@@ -150,6 +157,7 @@ namespace FEM2A {
             	DenseMatrix Ke;
             	Ke.set_size(3,3);
             	std::vector < double > Fe;
+            	
             	assemble_elementary_matrix( element, shape, quad, unit_fct, Ke);
             	local_to_global_matrix( M, i, Ke, K);
             	
@@ -160,13 +168,16 @@ namespace FEM2A {
             std::vector < bool > attr_dirich;
             std::vector < double > values(M.nb_vertices());
             attr_dirich.push_back(true);
+            
             for (int i = 0; i < M.nb_vertices(); ++i){
             	values[i] = zero_fct(M.get_vertex(i));
             }
+            
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
         	std::vector <double> U;
         	solve(K, F, U);
         	save_solution(U, "source_dirichlet_square_fine.bb");
+        	
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
@@ -178,6 +189,7 @@ namespace FEM2A {
         void sinus_bump_dirichlet_pb( const std::string& mesh_filename, bool verbose )
         {
             std::cout << "Solving a sinus bump Dirichlet problem \n" << std::endl;
+            bool diff = true; // Fait la différence entre la solution analytique et la solution obtenue par la méthode des éléments finis
             
             Mesh M;
             M.load(mesh_filename);
@@ -194,6 +206,7 @@ namespace FEM2A {
             	DenseMatrix Ke;
             	Ke.set_size(3,3);
             	std::vector < double > Fe;
+            	
             	assemble_elementary_matrix( element, shape, quad, unit_fct, Ke);
             	local_to_global_matrix( M, i, Ke, K);
             	
@@ -204,18 +217,30 @@ namespace FEM2A {
             std::vector < bool > attr_dirich;
             std::vector < double > values(M.nb_vertices());
             attr_dirich.push_back(true);
+            
             for (int i = 0; i < M.nb_vertices(); ++i){
             	values[i] = zero_fct(M.get_vertex(i));
             }
+            
         	apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
+        	
         	std::vector <double> U;
         	solve(K, F, U);
-        	save_solution(U, "sinus_bump_square.bb");
+        	
+        	if( diff ){
+        	  	for (int i = 0; i < M.nb_vertices(); ++i){
+            		U[i] -= soluce_sin_bump( M.get_vertex(i) );
+            	}
+            }
+            
+        	save_solution(U, "sinus_bump_diff_square.bb");
+        	
         	if ( verbose ) {
         		for (int i = 0; i < U.size(); ++i){ 
                 	std::cout << U[i] << std::endl;
                 }
             }
+            
             
         }
         
@@ -231,10 +256,13 @@ namespace FEM2A {
 
             std::vector <double> F(M.nb_vertices(), 0);
             SparseMatrix K(M.nb_vertices());
+            
 			Quadrature quad;
 			Quadrature quad_1D;
+			
 			quad = quad.get_quadrature(2, false);
 			ShapeFunctions shape = ShapeFunctions(2,1);
+			
 			quad_1D = quad_1D.get_quadrature(2, true);
 			ShapeFunctions shape_1D = ShapeFunctions(1,1);
             
@@ -244,6 +272,7 @@ namespace FEM2A {
             	DenseMatrix Ke;
             	Ke.set_size(3,3);
             	std::vector < double > Fe;
+            	
             	assemble_elementary_matrix( element, shape, quad, unit_fct, Ke);
             	local_to_global_matrix( M, i, Ke, K);
             	
@@ -256,9 +285,11 @@ namespace FEM2A {
             attr_dirich.push_back(true);
             attr_dirich.push_back(false);
             attr_dirich.push_back(false);
+            
             for (int i = 0; i < M.nb_vertices(); ++i){
             	values[i] = zero_fct(M.get_vertex(i));
             }
+            
             for (int i = 0; i < M.nb_edges(); ++i){
 				if( M.get_edge_attribute(i) == 1 ){
 					ElementMapping element( M, true, i);
@@ -269,9 +300,11 @@ namespace FEM2A {
 			}
 			
 			apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
+			
 			std::vector <double> U;
 			solve(K, F, U);
 			save_solution(U, "neumann_square_fine.bb");
+			
 			if ( verbose ) {
 				for (int i = 0; i < U.size(); ++i){ 
 					std::cout << U[i] << std::endl;
@@ -291,10 +324,13 @@ namespace FEM2A {
 
             std::vector <double> F(M.nb_vertices(), 0);
             SparseMatrix K(M.nb_vertices());
+            
 			Quadrature quad;
 			Quadrature quad_1D;
+			
 			quad = quad.get_quadrature(2, false);
 			ShapeFunctions shape = ShapeFunctions(2,1);
+			
 			quad_1D = quad_1D.get_quadrature(2, true);
 			ShapeFunctions shape_1D = ShapeFunctions(1,1);
             
@@ -304,6 +340,7 @@ namespace FEM2A {
             	DenseMatrix Ke;
             	Ke.set_size(3,3);
             	std::vector < double > Fe;
+            	
             	assemble_elementary_matrix( element, shape, quad, unit_fct, Ke);
             	local_to_global_matrix( M, i, Ke, K);
             	
@@ -315,9 +352,11 @@ namespace FEM2A {
             std::vector < double > values(M.nb_vertices());
             attr_dirich.push_back(true);
             attr_dirich.push_back(false);
+            
             for (int i = 0; i < M.nb_vertices(); ++i){
             	values[i] = 100*mug_eau_bouill(M.get_vertex(i));
             }
+            
             for (int i = 0; i < M.nb_edges(); ++i){
 				if( M.get_edge_attribute(i) == 1 ){
 					ElementMapping element( M, true, i);
@@ -328,9 +367,11 @@ namespace FEM2A {
 			}
 			
 			apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
+			
 			std::vector <double> U;
 			solve(K, F, U);
 			save_solution(U, "mug_0_5.bb");
+			
 			if ( verbose ) {
 				for (int i = 0; i < U.size(); ++i){ 
 					std::cout << U[i] << std::endl;

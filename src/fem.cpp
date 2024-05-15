@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <vector>
 
+
 namespace FEM2A {
 
     void print( const std::vector<double>& x )
@@ -442,11 +443,9 @@ namespace FEM2A {
         		}
         	}
         }
-        
-        
-        
     }
 
+/*
     void solve_poisson_problem(
             const Mesh& M,
             double (*diffusion_coef)(vertex),
@@ -457,7 +456,60 @@ namespace FEM2A {
             int verbose )
     {
         std::cout << "solve poisson problem" << '\n';
-        // TODO
-    }
+
+	    
+	    //M.set_attribute( Simu::unit_fct,  1, true);
+	    //M.set_attribute( Simu::mug_eau_bouill,  0, true);
+
+	    std::vector <double> F(M.nb_vertices(), 0);
+	    SparseMatrix K(M.nb_vertices());
+			Quadrature quad;
+			Quadrature quad_1D;
+			quad = quad.get_quadrature(2, false);
+			ShapeFunctions shape = ShapeFunctions(2,1);
+			quad_1D = quad_1D.get_quadrature(2, true);
+			ShapeFunctions shape_1D = ShapeFunctions(1,1);
+	    
+	    //sur les triangles
+	    for (int i = 0; i < M.nb_triangles(); ++i){
+	    	ElementMapping element( M, false, i);
+	    	DenseMatrix Ke;
+	    	Ke.set_size(3,3);
+	    	std::vector < double > Fe;
+	    	assemble_elementary_matrix( element, shape, quad, diffusion_coef, Ke);
+	    	local_to_global_matrix( M, i, Ke, K);
+	    	
+	    	//assemble_elementary_vector( element, shape, quad, Simu::source_fct, Fe);
+	    	local_to_global_vector( M, false, i, Fe, F);
+	    }
+	    
+	    std::vector < bool > attr_dirich;
+	    std::vector < double > values(M.nb_vertices());
+	    attr_dirich.push_back(true);
+	    attr_dirich.push_back(false);
+	    for (int i = 0; i < M.nb_vertices(); ++i){
+	    	values[i] = dirichlet_fct(M.get_vertex(i));
+	    }
+	    for (int i = 0; i < M.nb_edges(); ++i){
+			if( M.get_edge_attribute(i) == 1 ){
+				ElementMapping element( M, true, i);
+				std::vector < double > Fe;
+				assemble_elementary_neumann_vector(element, shape_1D, quad_1D, neumann_fct, Fe);
+				local_to_global_vector( M, true, i, Fe, F);
+			}
+		}	
+			
+		apply_dirichlet_boundary_conditions( M, attr_dirich, values, K, F);
+		std::vector <double> U;
+		solve(K, F, U);
+		save_solution(U, "mug_0_5.bb");
+		if ( verbose ) {
+			for (int i = 0; i < U.size(); ++i){ 
+				std::cout << U[i] << std::endl;
+			}
+		}
+		
+	}
+*/
 
 }
