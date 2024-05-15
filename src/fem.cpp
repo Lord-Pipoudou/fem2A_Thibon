@@ -137,24 +137,17 @@ namespace FEM2A {
         //std::cout << "[ElementMapping] constructor for element " << i << " ";
         std::vector< vertex > vertices;
         if ( border ) {
-        	//std::cout << "(border)" << std::endl;
         	for( int v=0; v<2; v++){
         		vertices.push_back( M.get_edge_vertex(i, v));
         	}
         	vertices_ = vertices; 
-        	/*std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y << "\nv1 : " << vertices_[1].x << " " << vertices_[1].y << std::endl;*/
         	
         }
         else {
-        	//std::cout << "(triangle)" << std::endl;
         	for( int v=0; v < 3; v++){
-        		//std::cout << v << std::endl;
         		vertices.push_back( M.get_triangle_vertex(i, v));
         	}
         	vertices_ = vertices;
-        	/*std::cout << "v0 : " << vertices_[0].x << " " << vertices_[0].y 
-        	<< "\n v1 : " << vertices_[1].x << " " << vertices_[1].y 
-        	<< "\n v2 : " << vertices_[2].x << " " << vertices_[2].y << std::endl;*/
         }
         		
         //std::cout << '\n';
@@ -297,8 +290,12 @@ namespace FEM2A {
         // TODO
         int max = reference_functions.nb_functions();
         int nbr_quad = quadrature.nb_points(); 
+        
+        //PARCOURS DES FONCTIONS DE REFERENCE + GRAD SUIVANT I OU J
         for (int i = 0; i < max; ++i){
         	for (int j = 0; j < max; ++j){
+        	
+        	// PARCOURS DES POINTS DE QUADRATURE
         		for (int q = 0; q < nbr_quad; ++q){
         			vertex quad = quadrature.point(q);
         			double w = quadrature.weight(q); 
@@ -311,6 +308,7 @@ namespace FEM2A {
         			vec2 pdti = JinvT.mult_2x2_2(gradi);
         			vec2 pdtj = JinvT.mult_2x2_2(gradj);
         			
+        			// CALCUL DE LA i-j-ème COMPOSANTE DE Ke pour le q-ième point de quadrature 
         			double Kij = w*coefficient(Me)*(pdti.x*pdtj.x + pdti.y*pdtj.y)*det;
         			Ke.add(i, j, Kij);
         		} 
@@ -348,8 +346,11 @@ namespace FEM2A {
         int nbr_quad = quadrature.nb_points(); 
         int max = reference_functions.nb_functions();
         
+        //PARCOURS DES FONCTIONS DE REFERENCE
         for (int i = 0; i < max; ++i){
         	double Fe_i = 0;
+        	
+        	// PARCOURS DES POINTS DE QUADRATURE
         	for (int q = 0; q < nbr_quad; ++q){
         		vertex quad = quadrature.point(q);
         		double w = quadrature.weight(q); 
@@ -357,6 +358,7 @@ namespace FEM2A {
         		double det = elt_mapping.jacobian(quad);
         		vertex Me = elt_mapping.transform(quad);
         		
+        		// CALCUL DE LA i-ème COMPOSANTE DE Fe
         		Fe_i += w*shape_i*source(Me)*det;
         	}
     		Fe.push_back(Fe_i);
@@ -376,8 +378,11 @@ namespace FEM2A {
         int nbr_quad = quadrature_1D.nb_points(); 
         int max = reference_functions_1D.nb_functions();
         
+        //PARCOURS DES FONCTIONS DE REFERENCE
         for (int i = 0; i < max; ++i){
         	double Fe_i = 0;
+        	
+        	// PARCOURS DES POINTS DE QUADRATURE
         	for (int q = 0; q < nbr_quad; ++q){
         		vertex quad = quadrature_1D.point(q);
         		double w = quadrature_1D.weight(q); 
@@ -385,6 +390,7 @@ namespace FEM2A {
         		double det = elt_mapping_1D.jacobian(quad);
         		vertex Me = elt_mapping_1D.transform(quad);
         		
+        		// CALCUL DE LA i-ème COMPOSANTE DE Fe
         		Fe_i += w*shape_i*neumann(Me)*det;
         	}
     		Fe.push_back(Fe_i);
